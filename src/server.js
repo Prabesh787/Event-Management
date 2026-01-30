@@ -8,6 +8,7 @@ import chatRoutes from "./routes/chat.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
 import eventRoutes from "./routes/event.routes.js";
+import registerRoutes from "./routes/register.routes.js";
 import { Server } from "socket.io";
 
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
@@ -42,6 +43,7 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/events", eventRoutes);
+app.use("/api/registrations", registerRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

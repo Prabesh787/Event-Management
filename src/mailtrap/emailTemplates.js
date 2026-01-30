@@ -10,8 +10,8 @@ export const VERIFICATION_EMAIL_TEMPLATE = `
     style="
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       line-height: 1.6;
-      color: #020617;
-
+      color: #0f172a;
+      background-color: #f8fafc;
       margin: 0;
       padding: 24px 12px;
     "
@@ -27,7 +27,7 @@ export const VERIFICATION_EMAIL_TEMPLATE = `
       <tr>
         <td
           style="
-            background: radial-gradient(circle at top left, #4f46e5, #1e293b);
+            background: linear-gradient(135deg, #14b8a6, #0d9488);
             padding: 24px 20px;
             border-radius: 18px 18px 0 0;
             text-align: left;
@@ -41,8 +41,8 @@ export const VERIFICATION_EMAIL_TEMPLATE = `
                     width: 36px;
                     height: 36px;
                     border-radius: 12px;
-                    background-color: rgba(15, 23, 42, 0.9);
-                    color: #e5e7eb;
+                    background-color: rgba(255, 255, 255, 0.2);
+                    color: #ffffff;
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
@@ -58,7 +58,7 @@ export const VERIFICATION_EMAIL_TEMPLATE = `
                     margin: 0;
                     font-size: 22px;
                     line-height: 1.3;
-                    color: #f9fafb;
+                    color: #ffffff;
                     font-weight: 700;
                   "
                 >
@@ -68,7 +68,7 @@ export const VERIFICATION_EMAIL_TEMPLATE = `
                   style="
                     margin: 4px 0 0;
                     font-size: 13px;
-                    color: #e5e7eb;
+                    color: rgba(255, 255, 255, 0.95);
                     max-width: 360px;
                   "
                 >
@@ -83,8 +83,8 @@ export const VERIFICATION_EMAIL_TEMPLATE = `
       <tr>
         <td
           style="
-            background-color: #0b1220;
-            border: 1px solid #1f2937;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
             border-top: none;
             border-radius: 0 0 18px 18px;
             padding: 24px 20px 20px;
@@ -92,18 +92,18 @@ export const VERIFICATION_EMAIL_TEMPLATE = `
         >
           <div
             style="
-              background: linear-gradient(135deg, #020617, #020617);
+              background: #f8fafc;
               border-radius: 14px;
               padding: 20px 18px;
-              box-shadow: 0 18px 40px rgba(15, 23, 42, 0.75);
+              border: 1px solid #e2e8f0;
             "
           >
-            <p style="margin: 0 0 8px; font-size: 13px; color: #e5e7eb;">
+            <p style="margin: 0 0 8px; font-size: 13px; color: #0f172a;">
               Hello,
             </p>
-            <p style="margin: 0 0 16px; font-size: 13px; color: #cbd5f5;">
+            <p style="margin: 0 0 16px; font-size: 13px; color: #334155;">
               Thank you for signing up to
-              <strong style="color: #e5e7eb;">Campus Event Hub</strong>. Use the
+              <strong style="color: #0f172a;">Campus Event Hub</strong>. Use the
               verification code below to confirm your email address:
             </p>
 
@@ -112,31 +112,31 @@ export const VERIFICATION_EMAIL_TEMPLATE = `
                 style="
                   display: inline-block;
                   padding: 12px 20px;
-                  border-radius: 999px;
-                  background: radial-gradient(circle at top, #4f46e5, #312e81);
-                  color: #f9fafb;
+                  border-radius: 12px;
+                  background: linear-gradient(135deg, #14b8a6, #0d9488);
+                  color: #ffffff;
                   font-size: 24px;
                   letter-spacing: 6px;
                   font-weight: 700;
-                  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.8);
+                  box-shadow: 0 4px 14px rgba(20, 184, 166, 0.4);
                 "
               >
                 {verificationCode}
               </span>
             </div>
 
-            <p style="margin: 0 0 6px; font-size: 12px; color: #9ca3af;">
+            <p style="margin: 0 0 6px; font-size: 12px; color: #64748b;">
               Enter this code on the verification screen within
-              <strong style="color: #e5e7eb;">15 minutes</strong> to complete
+              <strong style="color: #0f172a;">15 minutes</strong> to complete
               your registration.
             </p>
-            <p style="margin: 0 0 16px; font-size: 12px; color: #6b7280;">
+            <p style="margin: 0 0 16px; font-size: 12px; color: #64748b;">
               If you didn&apos;t request this, you can safely ignore this email.
             </p>
 
-            <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+            <p style="margin: 0; font-size: 12px; color: #64748b;">
               Best regards,<br />
-              <span style="color: #e5e7eb; font-weight: 600;"
+              <span style="color: #0f172a; font-weight: 600;"
                 >Campus Event Hub Team</span
               >
             </p>
@@ -146,7 +146,7 @@ export const VERIFICATION_EMAIL_TEMPLATE = `
             style="
               margin: 14px 0 0;
               font-size: 10px;
-              color: #6b7280;
+              color: #94a3b8;
               text-align: center;
             "
           >
@@ -172,8 +172,8 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
     style="
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       line-height: 1.6;
-      color: #020617;
-      background-color: #020617;
+      color: #0f172a;
+      background-color: #f8fafc;
       margin: 0;
       padding: 24px 12px;
     "
@@ -189,7 +189,7 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
       <tr>
         <td
           style="
-            background: radial-gradient(circle at top left, #4f46e5, #0f172a);
+            background: linear-gradient(135deg, #14b8a6, #0d9488);
             padding: 24px 20px;
             border-radius: 18px 18px 0 0;
             text-align: left;
@@ -200,8 +200,8 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
               width: 36px;
               height: 36px;
               border-radius: 12px;
-              background-color: rgba(15, 23, 42, 0.9);
-              color: #e5e7eb;
+              background-color: rgba(255, 255, 255, 0.2);
+              color: #ffffff;
               display: inline-flex;
               align-items: center;
               justify-content: center;
@@ -217,7 +217,7 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
               margin: 0;
               font-size: 22px;
               line-height: 1.3;
-              color: #f9fafb;
+              color: #ffffff;
               font-weight: 700;
             "
           >
@@ -227,7 +227,7 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
             style="
               margin: 4px 0 0;
               font-size: 13px;
-              color: #e5e7eb;
+              color: rgba(255, 255, 255, 0.95);
               max-width: 360px;
             "
           >
@@ -238,8 +238,8 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
       <tr>
         <td
           style="
-            background-color: #020617;
-            border: 1px solid #1f2937;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
             border-top: none;
             border-radius: 0 0 18px 18px;
             padding: 24px 20px 20px;
@@ -247,18 +247,18 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
         >
           <div
             style="
-              background: radial-gradient(circle at top, #020617, #020617);
+              background: #f8fafc;
               border-radius: 14px;
               padding: 20px 18px;
-              box-shadow: 0 18px 40px rgba(15, 23, 42, 0.8);
+              border: 1px solid #e2e8f0;
             "
           >
-            <p style="margin: 0 0 10px; font-size: 13px; color: #e5e7eb;">
+            <p style="margin: 0 0 10px; font-size: 13px; color: #0f172a;">
               Hello,
             </p>
-            <p style="margin: 0 0 18px; font-size: 13px; color: #cbd5f5;">
+            <p style="margin: 0 0 18px; font-size: 13px; color: #334155;">
               We&apos;re letting you know that the password for your
-              <strong style="color: #e5e7eb;">Campus Event Hub</strong> account
+              <strong style="color: #0f172a;">Campus Event Hub</strong> account
               has just been reset.
             </p>
 
@@ -270,21 +270,21 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
                   justify-content: center;
                   width: 54px;
                   height: 54px;
-                  border-radius: 999px;
-                  background: radial-gradient(circle at top, #22c55e, #16a34a);
-                  color: #ecfdf5;
+                  border-radius: 50%;
+                  background: linear-gradient(135deg, #10b981, #059669);
+                  color: #ffffff;
                   font-size: 30px;
-                  box-shadow: 0 16px 32px rgba(22, 163, 74, 0.55);
+                  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
                 "
               >
                 ✓
               </div>
             </div>
 
-            <p style="margin: 0 0 10px; font-size: 12px; color: #9ca3af;">
+            <p style="margin: 0 0 10px; font-size: 12px; color: #64748b;">
               If this was you, no further action is required.
             </p>
-            <p style="margin: 0 0 12px; font-size: 12px; color: #9ca3af;">
+            <p style="margin: 0 0 12px; font-size: 12px; color: #64748b;">
               If you didn&apos;t perform this action, please immediately:
             </p>
             <ul
@@ -292,7 +292,7 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
                 margin: 0 0 14px 18px;
                 padding: 0;
                 font-size: 12px;
-                color: #9ca3af;
+                color: #64748b;
               "
             >
               <li>Reset your password again from a trusted device.</li>
@@ -304,10 +304,10 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
               </li>
             </ul>
 
-            <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+            <p style="margin: 0; font-size: 12px; color: #64748b;">
               Thank you for helping us keep your account and campus data secure.
               <br />
-              <span style="color: #e5e7eb; font-weight: 600;"
+              <span style="color: #0f172a; font-weight: 600;"
                 >Campus Event Hub Team</span
               >
             </p>
@@ -317,7 +317,7 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
             style="
               margin: 14px 0 0;
               font-size: 10px;
-              color: #6b7280;
+              color: #94a3b8;
               text-align: center;
             "
           >
@@ -343,8 +343,8 @@ export const PASSWORD_RESET_REQUEST_TEMPLATE = `
     style="
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       line-height: 1.6;
-      color: #020617;
-      background-color: #020617;
+      color: #0f172a;
+      background-color: #f8fafc;
       margin: 0;
       padding: 24px 12px;
     "
@@ -360,7 +360,7 @@ export const PASSWORD_RESET_REQUEST_TEMPLATE = `
       <tr>
         <td
           style="
-            background: radial-gradient(circle at top left, #4f46e5, #0f172a);
+            background: linear-gradient(135deg, #14b8a6, #0d9488);
             padding: 24px 20px;
             border-radius: 18px 18px 0 0;
             text-align: left;
@@ -371,8 +371,8 @@ export const PASSWORD_RESET_REQUEST_TEMPLATE = `
               width: 36px;
               height: 36px;
               border-radius: 12px;
-              background-color: rgba(15, 23, 42, 0.9);
-              color: #e5e7eb;
+              background-color: rgba(255, 255, 255, 0.2);
+              color: #ffffff;
               display: inline-flex;
               align-items: center;
               justify-content: center;
@@ -388,7 +388,7 @@ export const PASSWORD_RESET_REQUEST_TEMPLATE = `
               margin: 0;
               font-size: 22px;
               line-height: 1.3;
-              color: #f9fafb;
+              color: #ffffff;
               font-weight: 700;
             "
           >
@@ -398,7 +398,7 @@ export const PASSWORD_RESET_REQUEST_TEMPLATE = `
             style="
               margin: 4px 0 0;
               font-size: 13px;
-              color: #e5e7eb;
+              color: rgba(255, 255, 255, 0.95);
               max-width: 360px;
             "
           >
@@ -410,8 +410,8 @@ export const PASSWORD_RESET_REQUEST_TEMPLATE = `
       <tr>
         <td
           style="
-            background-color: #020617;
-            border: 1px solid #1f2937;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
             border-top: none;
             border-radius: 0 0 18px 18px;
             padding: 24px 20px 20px;
@@ -419,18 +419,18 @@ export const PASSWORD_RESET_REQUEST_TEMPLATE = `
         >
           <div
             style="
-              background: radial-gradient(circle at top, #020617, #020617);
+              background: #f8fafc;
               border-radius: 14px;
               padding: 20px 18px;
-              box-shadow: 0 18px 40px rgba(15, 23, 42, 0.8);
+              border: 1px solid #e2e8f0;
             "
           >
-            <p style="margin: 0 0 12px; font-size: 13px; color: #e5e7eb;">
+            <p style="margin: 0 0 12px; font-size: 13px; color: #0f172a;">
               Hello,
             </p>
-            <p style="margin: 0 0 16px; font-size: 13px; color: #cbd5f5;">
+            <p style="margin: 0 0 16px; font-size: 13px; color: #334155;">
               We received a request to reset your
-              <strong style="color: #e5e7eb;">Campus Event Hub</strong> password.
+              <strong style="color: #0f172a;">Campus Event Hub</strong> password.
               If you didn&apos;t make this request, you can safely ignore this
               email.
             </p>
@@ -441,26 +441,26 @@ export const PASSWORD_RESET_REQUEST_TEMPLATE = `
                 style="
                   display: inline-block;
                   padding: 11px 22px;
-                  border-radius: 999px;
-                  background: radial-gradient(circle at top, #4f46e5, #4338ca);
-                  color: #f9fafb;
+                  border-radius: 8px;
+                  background: linear-gradient(135deg, #14b8a6, #0d9488);
+                  color: #ffffff;
                   font-size: 13px;
                   font-weight: 600;
                   text-decoration: none;
                   letter-spacing: 0.02em;
-                  box-shadow: 0 16px 36px rgba(30, 64, 175, 0.8);
+                  box-shadow: 0 4px 14px rgba(20, 184, 166, 0.4);
                 "
               >
                 Reset password
               </a>
             </div>
 
-            <p style="margin: 0 0 8px; font-size: 12px; color: #9ca3af;">
+            <p style="margin: 0 0 8px; font-size: 12px; color: #64748b;">
               This link will expire in
-              <strong style="color: #e5e7eb;">1 hour</strong> for security
+              <strong style="color: #0f172a;">1 hour</strong> for security
               reasons.
             </p>
-            <p style="margin: 0 0 14px; font-size: 12px; color: #6b7280;">
+            <p style="margin: 0 0 14px; font-size: 12px; color: #64748b;">
               If the button above does not work, copy and paste this URL into
               your browser:
             </p>
@@ -468,16 +468,16 @@ export const PASSWORD_RESET_REQUEST_TEMPLATE = `
               style="
                 margin: 0 0 14px;
                 font-size: 11px;
-                color: #9ca3af;
+                color: #64748b;
                 word-break: break-all;
               "
             >
               {resetURL}
             </p>
 
-            <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+            <p style="margin: 0; font-size: 12px; color: #64748b;">
               Best regards,<br />
-              <span style="color: #e5e7eb; font-weight: 600;"
+              <span style="color: #0f172a; font-weight: 600;"
                 >Campus Event Hub Team</span
               >
             </p>
@@ -487,7 +487,7 @@ export const PASSWORD_RESET_REQUEST_TEMPLATE = `
             style="
               margin: 14px 0 0;
               font-size: 10px;
-              color: #6b7280;
+              color: #94a3b8;
               text-align: center;
             "
           >

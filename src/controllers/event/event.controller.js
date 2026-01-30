@@ -1,4 +1,4 @@
-import Event from "../../models/event/event.js";
+import Event from "../../models/event/event.model.js";
 import { EVENT_STATUS } from "../../models/enum.js";
 
 export const getAllEvents = async (req, res) => {

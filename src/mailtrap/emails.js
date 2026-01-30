@@ -26,13 +26,13 @@ export const sendVerificationEmail = async (email, verificationToken) => {
 };
 
 export const sendWelcomeEmail = async (email, name) => {
-  const html = `<h1>Welcome, ${name}!</h1><p>Thanks for joining Universal Stationery Suppliers.</p>`;
+  const html = `<h1>Welcome, ${name}!</h1><p>Thanks for joining College Event Management.</p>`;
 
   try {
     const response = await transporter.sendMail({
       from: `"${sender.name}" <${sender.email}>`,
       to: email,
-      subject: "Welcome to Universal Stationery Suppliers!",
+      subject: "Welcome to College Event Management!",
       html,
     });
     console.log("Welcome email sent:", response.messageId);

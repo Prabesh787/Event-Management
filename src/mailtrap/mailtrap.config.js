@@ -30,6 +30,6 @@ export const transporter = nodemailer.createTransport({
 });
 
 export const sender = {
-  email: "hello@demomailtrap.com",
-  name: "Universal Stationery Suppliers",
+  email: "eventsedu73@gmail.com",
+  name: "Bigyan Khadka",
 };
