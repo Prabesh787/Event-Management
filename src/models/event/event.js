@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { EVENT_STATUS } from "../enums.js";
+import { EVENT_STATUS } from "../enum.js";
 
 const eventSchema = new mongoose.Schema(
   {
