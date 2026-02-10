@@ -10,14 +10,11 @@ import {
   allUsers,
 } from "../controllers/auth/auth.controller.js";
 import { verifyTokenMiddleware } from "../middleware/verifyTokenMiddleware.js";
-// const {
-//   registerUser,
-//   authUser,
-//   allUsers,
-//   getUserById,
-// } = require("../controllers/auth/user.controller");
+import { googleAuth } from "../controllers/auth/googleAuth.controller.js";
 
 const router = express.Router();
+
+router.post("/google", googleAuth);
 
 router.get("/check-auth", verifyTokenMiddleware, checkAuth);
 router.post("/signup", signup);
