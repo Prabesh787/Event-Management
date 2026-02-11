@@ -19,6 +19,17 @@ const registerSchema = new mongoose.Schema(
       enum: ["REGISTERED", "CANCELLED"],
       default: "REGISTERED",
     },
+
+    /**
+     * NEW: Dynamic registration data.
+     * Use a Map of Strings to store flexible event-specific answers 
+     * (e.g., dietaryNotes: "Vegan", tShirtSize: "XL").
+     */
+    additionalInfo: {
+      type: Map,
+      of: String,
+      default: {},
+    },
   },
   { timestamps: true }
 );
@@ -27,4 +38,3 @@ const registerSchema = new mongoose.Schema(
 registerSchema.index({ user: 1, event: 1 }, { unique: true });
 
 export default mongoose.model("Register", registerSchema);
-

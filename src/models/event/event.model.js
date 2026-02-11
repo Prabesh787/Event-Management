@@ -31,10 +31,27 @@ const eventSchema = new mongoose.Schema(
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
 
+    registrationStartDate: { type: Date }, 
+    registrationEndDate: { type: Date },
+
     totalSeats: Number,
     availableSeats: Number,
 
     price: { type: Number, default: 0 },
+    
+    registrationFields: [
+      {
+        label: { type: String, required: true }, // e.g., "T-Shirt Size"
+        name: { type: String, required: true },  // e.g., "tShirtSize" (JSON key)
+        fieldType: { 
+          type: String, 
+          enum: ["text", "number", "select", "checkbox"], 
+          default: "text" 
+        },
+        options: [String], // Only used if fieldType is "select"
+        required: { type: Boolean, default: false }
+      }
+    ],
 
     status: {
       type: String,
