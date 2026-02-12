@@ -11,10 +11,17 @@ export const googleAuth = async (req, res) => {
       return res.status(400).json({ success: false, message: "Token missing" });
     }
 
+    const googleClientId = process.env.GOOGLE_CLIENT_ID;
+    if (!googleClientId) {
+      return res
+        .status(500)
+        .json({ success: false, message: "Server OAuth not configured" });
+    }
+
     // Verify Google token
     const ticket = await client.verifyIdToken({
       idToken: token,
-      audience: "423512627428-ge7b6qmbkm6emofr4fukgoboptv0rpkc.apps.googleusercontent.com",
+      audience: googleClientId,
     });
 
     const { email, name, picture, email_verified } = ticket.getPayload();
