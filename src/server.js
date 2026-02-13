@@ -15,6 +15,7 @@ import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 
 import { connectDB } from "./config/db.js";
 import { createDefaultAdminUser } from "./utils/createDefaultAdminUser.js";
+import { setIO } from "./config/socket.js";
 
 dotenv.config();
 
@@ -59,9 +60,10 @@ const server = app.listen(PORT, async () => {
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:5100",
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
   },
 });
+setIO(io);
 
 io.on("connection", (socket) => {
   console.log("Connected to socket.io");

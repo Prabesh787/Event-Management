@@ -1,5 +1,7 @@
 import Event from "../../models/event/event.model.js";
 import { EVENT_STATUS } from "../../models/enum.js";
+import { getIO } from "../../config/socket.js";
+import Notification from "../../models/notification/notification.model.js";
 
 export const getAllEvents = async (req, res) => {
   try {
@@ -94,6 +96,32 @@ export const createEvent = async (req, res) => {
       status: status && Object.values(EVENT_STATUS).includes(status) ? status : EVENT_STATUS.DRAFT,
       bannerImage: bannerImage || undefined,
       registrationFields: registrationFields || [], // NEW: Save the dynamic fields array
+    });
+
+    // 2. Save the BROADCAST Notification to DB
+    // We save this so users can see it in their history later
+    const notification = await Notification.create({
+      title: 'New Event Alert!',
+      message: `A new event "${title}" has been listed.`,
+      category: 'NEW_EVENT',
+      scope: 'BROADCAST',
+      data: {
+        eventId: event._id,
+        action: 'OPEN_EVENT'
+      }
+    });
+
+    // 3. Dispatch Real-Time Alert via Socket.io
+    // Since it's a BROADCAST, we use io.emit to send to ALL connected clients
+    const io = getIO();
+    if (io) io.emit("receive_notification", {
+      _id: notification._id,
+      title: notification.title,
+      message: notification.message,
+      category: notification.category,
+      scope: notification.scope,
+      data: notification.data,
+      createdAt: notification.createdAt
     });
 
     // 3. Populate and return
