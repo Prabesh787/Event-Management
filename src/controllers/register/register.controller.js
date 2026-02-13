@@ -5,7 +5,9 @@ import Event from "../../models/event/event.model.js";
 export const registerForEvent = async (req, res) => {
   try {
     const userId = req.userId;
-    const { eventId } = req.body;
+    // 1. Capture additionalInfo from the body
+    const { eventId, additionalInfo } = req.body; 
+    const now = new Date(); // Fix: Define current time for window checks
 
     if (!userId) {
       return res.status(401).json({
@@ -23,28 +25,37 @@ export const registerForEvent = async (req, res) => {
 
     const event = await Event.findById(eventId);
     if (!event) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Event not found" });
+      return res.status(404).json({ success: false, message: "Event not found" });
     }
 
-    if (event.status === "CANCELLED" || event.status === "COMPLETED") {
+    // Check if PUBLISHED
+    if (event.status !== "PUBLISHED") {
+      let statusMessage = "This event is not open for registration";
+      if (event.status === "DRAFT") statusMessage = "Event is still in draft.";
+      else if (event.status === "CANCELLED" || event.status === "COMPLETED") {
+        statusMessage = `Event is ${event.status.toLowerCase()}.`;
+      }
+      return res.status(400).json({ success: false, message: statusMessage });
+    }
+
+    // 2. Check Registration Window (using 'now')
+    if (event.registrationStartDate && now < event.registrationStartDate) {
       return res.status(400).json({
         success: false,
-        message: "This event is not open for registration",
+        message: `Registration opens on ${event.registrationStartDate.toLocaleString()}`,
       });
     }
 
-    // If event tracks capacity, ensure there are seats left
-    if (
-      typeof event.totalSeats === "number" &&
-      typeof event.availableSeats === "number" &&
-      event.availableSeats <= 0
-    ) {
+    if (event.registrationEndDate && now > event.registrationEndDate) {
       return res.status(400).json({
         success: false,
-        message: "This event is already full",
+        message: "Registration for this event has already closed",
       });
+    }
+
+    // Check Capacity
+    if (typeof event.totalSeats === "number" && event.availableSeats <= 0) {
+      return res.status(400).json({ success: false, message: "This event is full" });
     }
 
     // Prevent duplicate registration
@@ -56,20 +67,22 @@ export const registerForEvent = async (req, res) => {
       });
     }
 
+    // 3. Save Registration with additionalInfo
     const registration = existing
       ? await Register.findByIdAndUpdate(
           existing._id,
-          { status: "REGISTERED" },
+          { status: "REGISTERED", additionalInfo }, // Update info if re-registering
           { new: true }
         )
-      : await Register.create({ user: userId, event: eventId });
+      : await Register.create({ 
+          user: userId, 
+          event: eventId, 
+          additionalInfo // Save the dynamic fields
+        });
 
-    // Update availableSeats if tracked
+    // Update availableSeats
     if (typeof event.totalSeats === "number") {
-      const currentAvailable =
-        typeof event.availableSeats === "number"
-          ? event.availableSeats
-          : event.totalSeats;
+      const currentAvailable = event.availableSeats ?? event.totalSeats;
       event.availableSeats = Math.max(0, currentAvailable - 1);
       await event.save();
     }
@@ -85,10 +98,7 @@ export const registerForEvent = async (req, res) => {
     });
   } catch (error) {
     console.error("registerForEvent error:", error);
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 

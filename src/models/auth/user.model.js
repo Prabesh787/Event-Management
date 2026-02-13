@@ -2,14 +2,27 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
+    // email: {
+    //   type: String,
+    //   required: true,
+    //   unique: true,
+    // },
     email: {
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
+      trim: true,
     },
+    // password: {
+    //   type: String,
+    //   required: true,
+    // },
     password: {
       type: String,
-      required: true,
+      required: function () {
+        return this.authProvider === "local";
+      },
     },
     name: {
       type: String,
@@ -32,12 +45,20 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    authProvider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
+    },
+    profilePic: String,
     resetPasswordToken: String,
     resetPasswordExpiresAt: Date,
     verificationToken: String,
     verificationTokenExpiresAt: Date,
   },
-  { timestamps: true }
+  { timestamps: true },
 );
+
+userSchema.index({ email: 1 });
 
 export const User = mongoose.model("User", userSchema);
