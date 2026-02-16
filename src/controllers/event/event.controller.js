@@ -2,6 +2,7 @@ import Event from "../../models/event/event.model.js";
 import { EVENT_STATUS } from "../../models/enum.js";
 import { getIO } from "../../config/socket.js";
 import Notification from "../../models/notification/notification.model.js";
+import { uploadEventBannerImage } from "../../utils/cloudinaryUpload.js";
 
 export const getAllEvents = async (req, res) => {
   try {
@@ -79,6 +80,13 @@ export const createEvent = async (req, res) => {
 
     const availableSeats = totalSeats != null ? Number(totalSeats) : undefined;
 
+    // Resolve banner: upload base64 to Cloudinary (eventManagement/events/[event_name])
+    let bannerUrl = bannerImage || undefined;
+    if (bannerImage && typeof bannerImage === "string" && bannerImage.startsWith("data:")) {
+      const result = await uploadEventBannerImage(title, bannerImage);
+      if (result?.url) bannerUrl = result.url;
+    }
+
     // 2. Create the event document
     const event = await Event.create({
       title,
@@ -94,7 +102,7 @@ export const createEvent = async (req, res) => {
       availableSeats: availableSeats ?? 0,
       price: price != null ? Number(price) : 0,
       status: status && Object.values(EVENT_STATUS).includes(status) ? status : EVENT_STATUS.DRAFT,
-      bannerImage: bannerImage || undefined,
+      bannerImage: bannerUrl,
       registrationFields: registrationFields || [], // NEW: Save the dynamic fields array
     });
 
@@ -166,6 +174,11 @@ export const updateEvent = async (req, res) => {
         if (key === "status" && !Object.values(EVENT_STATUS).includes(req.body[key])) continue;
         event[key] = req.body[key];
       }
+    }
+    // Upload new banner if base64
+    if (req.body.bannerImage && typeof req.body.bannerImage === "string" && req.body.bannerImage.startsWith("data:")) {
+      const result = await uploadEventBannerImage(event.title, req.body.bannerImage);
+      if (result?.url) event.bannerImage = result.url;
     }
     await event.save();
 
