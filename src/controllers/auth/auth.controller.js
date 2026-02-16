@@ -3,6 +3,8 @@ import crypto from "crypto";
 import { User } from "../../models/auth/user.model.js";
 import { generateVerificationToken } from "../../utils/generateVerificationToken.js";
 import { generateTokenAndSetCookie } from "../../utils/generateTokenAndSendCookie.js";
+import { uploadUserProfileImage } from "../../utils/cloudinaryUpload.js";
+import { isCloudinaryConfigured } from "../../config/cloudinary.js";
 import {
   sendPasswordResetEmail,
   sendResetSuccessEmail,
@@ -276,4 +278,57 @@ export const allUsers = expressAsyncHandler(async (req, res) => {
     });
   }
 });
+
+/**
+ * PATCH /api/user/profile-picture
+ * Upload profile image to Cloudinary (eventManagement/user/[user_name]) and update user.
+ * Body: multipart with "profilePic" file, OR JSON with { profilePic: "data:image/...;base64,..." }
+ */
+export const updateProfilePicture = async (req, res) => {
+  try {
+    const source = req.file || (req.body && req.body.profilePic) || null;
+    if (!source) {
+      return res.status(400).json({
+        success: false,
+        message: "Provide profilePic as file (multipart) or base64 (JSON)",
+      });
+    }
+
+    if (!isCloudinaryConfigured()) {
+      const missing = [];
+      if (!process.env.CLOUDINARY_CLOUD_NAME) missing.push("CLOUDINARY_CLOUD_NAME");
+      if (!process.env.CLOUDINARY_API_KEY) missing.push("CLOUDINARY_API_KEY");
+      if (!process.env.CLOUDINARY_API_SECRET) missing.push("CLOUDINARY_API_SECRET");
+      return res.status(503).json({
+        success: false,
+        message: `Cloudinary not configured. Missing: ${missing.join(", ") || "env vars not loaded (restart server)"}`,
+      });
+    }
+
+    const user = await User.findById(req.userId).select("name");
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const result = await uploadUserProfileImage(user.name, source);
+    if (!result || !result.url) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to upload image",
+      });
+    }
+
+    await User.findByIdAndUpdate(req.userId, { profilePic: result.url });
+    const updated = await User.findById(req.userId).select("-password");
+
+    res.status(200).json({
+      success: true,
+      message: "Profile picture updated",
+      user: updated,
+    });
+  } catch (error) {
+    console.error("updateProfilePicture error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
