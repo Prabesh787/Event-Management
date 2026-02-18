@@ -59,7 +59,14 @@ const eventSchema = new mongoose.Schema(
       default: EVENT_STATUS.DRAFT,
     },
 
-    bannerImage: String,
+    /**
+     * Event banner stored in Cloudinary.
+     * Folder: eventManagement/events/[event_name]
+     */
+    bannerImage: {
+      url: { type: String },
+      publicId: { type: String },
+    },
   },
   { timestamps: true }
 );
