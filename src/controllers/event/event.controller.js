@@ -211,6 +211,46 @@ export const updateEvent = async (req, res) => {
         event[key] = req.body[key];
       }
     }
+
+    // If location was updated, validate based on location.type (or infer it)
+    if (req.body.location !== undefined) {
+      const loc = event.location || {};
+      const inferredType =
+        loc.type ||
+        (loc.onCampus && (loc.onCampus.building || loc.onCampus.room || loc.onCampus.landmark)
+          ? "ON_CAMPUS"
+          : loc.venue || loc.address || loc.city
+            ? "OFF_CAMPUS"
+            : "ON_CAMPUS");
+
+      loc.type = inferredType;
+
+      if (inferredType === "ON_CAMPUS") {
+        const on = loc.onCampus || {};
+        if (!on.building && !on.room && !on.landmark && !loc.venue) {
+          return res.status(400).json({
+            success: false,
+            message:
+              "For ON_CAMPUS events, provide location.onCampus (building/room/landmark)",
+          });
+        }
+      } else if (inferredType === "OFF_CAMPUS") {
+        if (!loc.venue && !loc.address && !loc.city) {
+          return res.status(400).json({
+            success: false,
+            message:
+              "For OFF_CAMPUS events, provide at least one of: location.venue, location.address, location.city",
+          });
+        }
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "location.type must be ON_CAMPUS or OFF_CAMPUS",
+        });
+      }
+
+      event.location = loc;
+    }
     // Backward compatibility: if bannerImage is base64 string, upload and store { url, publicId }
     if (typeof req.body.bannerImage === "string" && req.body.bannerImage.startsWith("data:")) {
       const result = await uploadEventBannerImage(event.title, req.body.bannerImage);
