@@ -9,6 +9,7 @@ import messageRoutes from "./routes/message.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
 import eventRoutes from "./routes/event.routes.js";
 import registerRoutes from "./routes/register.routes.js";
+import reviewRoutes from "./routes/review.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import { Server } from "socket.io";
 
@@ -46,6 +47,7 @@ app.use("/api/message", messageRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/registrations", registerRoutes);
+app.use("/api/reviews", reviewRoutes);
 app.use("/api/notifications", notificationRoutes);
 
 app.use(notFound);
