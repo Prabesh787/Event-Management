@@ -328,8 +328,11 @@ export const deleteNotification = async (req, res) => {
     }
 
     const { User } = await import("../../models/auth/user.model.js");
+    const { USER_ROLE } = await import("../../models/enum.js");
     const user = await User.findById(userId).select("role").lean();
-    const isAdmin = user?.role === "ADMIN";
+    const isAdmin =
+      user &&
+      [USER_ROLE.ADMIN, USER_ROLE.SYSTEM_ADMIN].includes(user.role);
 
     if (isAdmin) {
       await Notification.findByIdAndDelete(req.params.id);

@@ -14,8 +14,19 @@ const eventSchema = new mongoose.Schema(
 
     organizer: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // if you have users
+      ref: "User",
       required: true,
+    },
+
+    /**
+     * The institution that owns this event.
+     * For legacy events created before multi-vendor, this can be null.
+     */
+    institution: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Institution",
+      default: null,
+      index: true,
     },
 
     location: {
@@ -31,26 +42,26 @@ const eventSchema = new mongoose.Schema(
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
 
-    registrationStartDate: { type: Date }, 
+    registrationStartDate: { type: Date },
     registrationEndDate: { type: Date },
 
     totalSeats: Number,
     availableSeats: Number,
 
     price: { type: Number, default: 0 },
-    
+
     registrationFields: [
       {
-        label: { type: String, required: true }, // e.g., "T-Shirt Size"
-        name: { type: String, required: true },  // e.g., "tShirtSize" (JSON key)
-        fieldType: { 
-          type: String, 
-          enum: ["text", "number", "select", "checkbox"], 
-          default: "text" 
+        label: { type: String, required: true },
+        name: { type: String, required: true },
+        fieldType: {
+          type: String,
+          enum: ["text", "number", "select", "checkbox"],
+          default: "text",
         },
-        options: [String], // Only used if fieldType is "select"
-        required: { type: Boolean, default: false }
-      }
+        options: [String],
+        required: { type: Boolean, default: false },
+      },
     ],
 
     status: {
@@ -68,7 +79,7 @@ const eventSchema = new mongoose.Schema(
       publicId: { type: String },
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model("Event", eventSchema);

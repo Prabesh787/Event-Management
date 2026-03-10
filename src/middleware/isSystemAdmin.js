@@ -2,10 +2,11 @@ import { User } from "../models/auth/user.model.js";
 import { USER_ROLE } from "../models/enum.js";
 
 /**
- * Legacy admin middleware.
- * Now treats both ADMIN and SYSTEM_ADMIN as "admin".
+ * Use after verifyTokenMiddleware.
+ * Ensures the authenticated user is a system-level admin.
+ * Accepts both legacy "ADMIN" and new USER_ROLE.SYSTEM_ADMIN.
  */
-export const isAdmin = async (req, res, next) => {
+export const isSystemAdmin = async (req, res, next) => {
   try {
     if (!req.userId) {
       return res.status(401).json({
@@ -27,16 +28,17 @@ export const isAdmin = async (req, res, next) => {
     if (!allowedRoles.includes(user.role)) {
       return res.status(403).json({
         success: false,
-        message: "Forbidden - admin access required",
+        message: "Forbidden - system admin access required",
       });
     }
 
     next();
   } catch (error) {
-    console.error("isAdmin middleware error:", error);
+    console.error("isSystemAdmin middleware error:", error);
     return res.status(500).json({
       success: false,
       message: "Server error",
     });
   }
 };
+

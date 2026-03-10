@@ -1,45 +1,56 @@
 // enums.js
 
 export const EVENT_STATUS = {
-    DRAFT: "DRAFT",
-    UPCOMING: "UPCOMING",
-    PUBLISHED: "PUBLISHED",
-    CANCELLED: "CANCELLED",
-    COMPLETED: "COMPLETED",
-  };
-  
-  export const BOOKING_STATUS = {
-    PENDING: "PENDING",
-    CONFIRMED: "CONFIRMED",
-    CANCELLED: "CANCELLED",
-    FAILED: "FAILED",
-  };
-  
-  export const PAYMENT_STATUS = {
-    UNPAID: "UNPAID",
-    PAID: "PAID",
-    REFUNDED: "REFUNDED",
-  };
-  
-  export const SEAT_STATUS = {
-    AVAILABLE: "AVAILABLE",
-    RESERVED: "RESERVED",
-    BOOKED: "BOOKED",
-  };
-  
-  export const NOTIFICATION_TYPE = {
-    EMAIL: "EMAIL",
-    SMS: "SMS",
-    PUSH: "PUSH",
-  };
-  
-  export const TICKET_STATUS = {
-    ACTIVE: "ACTIVE",
-    USED: "USED",
-    CANCELLED: "CANCELLED",
-  };
-  
-  export const USER_ROLE = {
-    ADMIN: "ADMIN",
-    STUDENT: "STUDENT",
-  };
+  DRAFT: "DRAFT",
+  UPCOMING: "UPCOMING",
+  PUBLISHED: "PUBLISHED",
+  CANCELLED: "CANCELLED",
+  COMPLETED: "COMPLETED",
+};
+
+export const BOOKING_STATUS = {
+  PENDING: "PENDING",
+  CONFIRMED: "CONFIRMED",
+  CANCELLED: "CANCELLED",
+  FAILED: "FAILED",
+};
+
+export const PAYMENT_STATUS = {
+  UNPAID: "UNPAID",
+  PAID: "PAID",
+  REFUNDED: "REFUNDED",
+};
+
+export const SEAT_STATUS = {
+  AVAILABLE: "AVAILABLE",
+  RESERVED: "RESERVED",
+  BOOKED: "BOOKED",
+};
+
+export const NOTIFICATION_TYPE = {
+  EMAIL: "EMAIL",
+  SMS: "SMS",
+  PUSH: "PUSH",
+};
+
+export const TICKET_STATUS = {
+  ACTIVE: "ACTIVE",
+  USED: "USED",
+  CANCELLED: "CANCELLED",
+};
+
+// User roles
+export const USER_ROLE = {
+  // Legacy name kept for backward compatibility
+  ADMIN: "ADMIN",
+  SYSTEM_ADMIN: "SYSTEM_ADMIN",
+  INSTITUTION_ADMIN: "INSTITUTION_ADMIN",
+  STUDENT: "STUDENT",
+};
+
+// Institution verification lifecycle
+export const INSTITUTION_STATUS = {
+  PENDING_VERIFICATION: "PENDING_VERIFICATION",
+  VERIFIED: "VERIFIED",
+  REJECTED: "REJECTED",
+};

@@ -1,12 +1,8 @@
 import mongoose from "mongoose";
+import { USER_ROLE } from "../enum.js";
 
 const userSchema = new mongoose.Schema(
   {
-    // email: {
-    //   type: String,
-    //   required: true,
-    //   unique: true,
-    // },
     email: {
       type: String,
       required: true,
@@ -14,10 +10,6 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
-    // password: {
-    //   type: String,
-    //   required: true,
-    // },
     password: {
       type: String,
       required: function () {
@@ -34,8 +26,17 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["ADMIN", "STUDENT"],
-      default: "STUDENT",
+      enum: Object.values(USER_ROLE),
+      default: USER_ROLE.STUDENT,
+    },
+    /**
+     * If this user is an institution admin, this links to their Institution.
+     * For SYSTEM_ADMIN / regular STUDENT this can be null.
+     */
+    institution: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Institution",
+      default: null,
     },
     isVerified: {
       type: Boolean,
