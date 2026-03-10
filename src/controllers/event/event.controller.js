@@ -1,5 +1,6 @@
 import Event from "../../models/event/event.model.js";
 import { EVENT_STATUS } from "../../models/enum.js";
+import { User } from "../../models/auth/user.model.js";
 import { getIO } from "../../config/socket.js";
 import Notification from "../../models/notification/notification.model.js";
 import {
@@ -84,6 +85,15 @@ export const createEvent = async (req, res) => {
 
     const availableSeats = totalSeats != null ? Number(totalSeats) : undefined;
 
+    // Determine institution ownership:
+    // - For institution admins, we expect user.institution to be set.
+    // - For system admins, this may be null (they can create global events or specify institution later if needed).
+    let institutionId = null;
+    if (req.userId) {
+      const creator = await User.findById(req.userId).select("role institution");
+      institutionId = creator?.institution || null;
+    }
+
     // Upload-first flow:
     // - Frontend uploads banner via POST /api/events/banner and gets { bannerUrl, publicId }
     // - Then sends bannerImage: { url, publicId } (or bannerUrl for legacy clients).
@@ -112,6 +122,7 @@ export const createEvent = async (req, res) => {
       description,
       category,
       organizer: req.userId,
+      institution: institutionId,
       location: location || {},
       startDate,
       endDate,
@@ -154,7 +165,8 @@ export const createEvent = async (req, res) => {
     // 3. Populate and return
     const populated = await Event.findById(event._id)
       .populate("category", "name description")
-      .populate("organizer", "name email");
+      .populate("organizer", "name email")
+      .populate("institution", "name city country");
 
     res.status(201).json({ success: true, event: populated });
   } catch (error) {
