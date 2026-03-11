@@ -2,6 +2,7 @@ import express from "express";
 import {
   getAllEvents,
   getEventById,
+  getEventsByInstitution,
   uploadEventBanner,
   patchEventBanner,
   createEvent,
@@ -29,6 +30,7 @@ router.patch(
   patchEventBanner
 );
 router.get("/:id", getEventById);
+router.get("/institution/:institutionId", verifyTokenMiddleware, getEventsByInstitution);
 // Event creation and management require a verified institution (or system admin)
 router.post(
   "/",

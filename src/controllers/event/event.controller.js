@@ -56,6 +56,49 @@ export const getEventById = async (req, res) => {
   }
 };
 
+export const getEventsByInstitution = async (req, res) => {
+  try {
+    const { institutionId } = req.params;
+    const { category, status, search, page = 1, limit = 20 } = req.query;
+
+    if (!institutionId) {
+      return res.status(400).json({
+        success: false,
+        message: "Institution ID is required",
+      });
+    }
+
+    const filter = { institution: institutionId };
+
+    if (category) filter.category = category;
+    if (status) filter.status = status;
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    const skip = (Number(page) - 1) * Number(limit);
+    const events = await Event.find(filter)
+      .populate("category", "name description")
+      .populate("organizer", "name email")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit))
+      .lean();
+
+    const total = await Event.countDocuments(filter);
+    res.status(200).json({
+      success: true,
+      events,
+      pagination: { page: Number(page), limit: Number(limit), total },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 export const createEvent = async (req, res) => {
   try {
     const {
@@ -269,6 +312,30 @@ export const updateEvent = async (req, res) => {
       if (result?.url) event.bannerImage = { url: result.url, publicId: result.publicId };
     }
     await event.save();
+
+    // 2. Save the UPDATED Notification to DB
+    const notification = await Notification.create({
+      title: 'Event Updated!',
+      message: `The event "${event.title}" has been updated.`,
+      category: 'EVENT_UPDATED',
+      scope: 'BROADCAST',
+      data: {
+        eventId: event._id,
+        action: 'OPEN_EVENT'
+      }
+    });
+
+    // 3. Dispatch Real-Time Alert via Socket.io
+    const io = getIO();
+    if (io) io.emit("receive_notification", {
+      _id: notification._id,
+      title: notification.title,
+      message: notification.message,
+      category: notification.category,
+      scope: notification.scope,
+      data: notification.data,
+      createdAt: notification.createdAt
+    });
 
     const populated = await Event.findById(event._id)
       .populate("category", "name description")
