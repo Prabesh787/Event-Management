@@ -9,6 +9,7 @@ import {
   markNotificationRead,
 } from "../controllers/notification/notification.controller.js";
 import { verifyTokenMiddleware } from "../middleware/verifyTokenMiddleware.js";
+import { isInstitutionAdmin } from "../middleware/isInstitutionAdmin.js"; 
 import { isAdmin } from "../middleware/isAdmin.js";
 
 const router = express.Router();
@@ -17,13 +18,13 @@ const router = express.Router();
 router.get("/me", verifyTokenMiddleware, getMyNotifications);
 
 // Admin: create custom notification and send to desired user(s)
-router.post("/", verifyTokenMiddleware, isAdmin, createNotification);
+router.post("/", verifyTokenMiddleware, isInstitutionAdmin, createNotification);
 
 // Admin: all notifications with user list
 router.get(
   "/",
   verifyTokenMiddleware,
-  isAdmin,
+  isInstitutionAdmin,
   getAllNotifications
 );
 
@@ -34,12 +35,12 @@ router.get("/:id", verifyTokenMiddleware, getNotificationById);
 router.put(
   "/:id",
   verifyTokenMiddleware,
-  isAdmin,
+  isInstitutionAdmin,  
   updateNotification
 );
 
 // Delete: admin = hard delete, user = soft delete (remove from my list)
-router.delete("/:id", verifyTokenMiddleware, deleteNotification);
+router.delete("/:id", verifyTokenMiddleware, isInstitutionAdmin, deleteNotification);
 
 // Mark as read for current user
 router.patch("/:id/read", verifyTokenMiddleware, markNotificationRead);
