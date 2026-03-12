@@ -19,6 +19,7 @@ import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import { connectDB } from "./config/db.js";
 import { createDefaultAdminUser } from "./utils/createDefaultAdminUser.js";
 import { setIO } from "./config/socket.js";
+import initEventStatusCron from "./cron/eventStatusCron.js";
 
 dotenv.config();
 
@@ -60,6 +61,7 @@ const PORT = process.env.PORT || 7100;
 const server = app.listen(PORT, async () => {
   await connectDB();
   await createDefaultAdminUser();
+  initEventStatusCron();
   console.log(`Server Started on PORT ${PORT}`.yellow.bold);
 });
 
