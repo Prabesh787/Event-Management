@@ -75,6 +75,35 @@ export const applyForInstitution = async (req, res) => {
       status: INSTITUTION_STATUS.PENDING_VERIFICATION,
     });
 
+    // Send Real-Time Notification to System Admins
+    try {
+      const admins = await User.find({
+        role: { $in: [USER_ROLE.SYSTEM_ADMIN, USER_ROLE.ADMIN] },
+      }).select("_id");
+
+      const adminIds = admins.map((admin) => admin._id);
+
+      const notification = await Notification.create({
+        title: "New Institution Application",
+        message: `A new institution application for "${name}" has been submitted and is pending verification.`,
+        category: "SYSTEM",
+        scope: "TARGETED",
+        allowedUsers: adminIds,
+        data: {
+          institutionId: institution._id,
+          action: "VERIFY_INSTITUTION",
+        },
+      });
+
+      const io = getIO();
+      if (io) {
+        // Broadcast to all clients; frontend should filter by role or use admin room
+        io.emit("receive_notification", notification);
+      }
+    } catch (notifError) {
+      console.warn("Failed to send admin notification for new institution:", notifError);
+    }
+
     return res.status(201).json({
       success: true,
       message:
