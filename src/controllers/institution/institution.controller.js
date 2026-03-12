@@ -1,6 +1,8 @@
 import Institution from "../../models/institution/institution.model.js";
 import { User } from "../../models/auth/user.model.js";
 import { INSTITUTION_STATUS, USER_ROLE } from "../../models/enum.js";
+import Notification from "../../models/notification/notification.model.js";
+import { getIO } from "../../config/socket.js";
 
 /**
  * Student (or any logged-in user) applies to register an institution.
@@ -221,6 +223,32 @@ export const updateInstitutionStatus = async (req, res) => {
         owner.institution = institution._id;
         await owner.save();
       }
+    }
+
+    // Send Real-Time Notification to Owner
+    try {
+      const notification = await Notification.create({
+        title: status === INSTITUTION_STATUS.VERIFIED ? 'Institution Verified!' : 'Institution Status Updated',
+        message: status === INSTITUTION_STATUS.VERIFIED 
+          ? `Congratulations! Your institution "${institution.name}" has been verified. You now have admin access.`
+          : `Your institution "${institution.name}" status has been updated to ${status}.`,
+        category: 'SYSTEM',
+        scope: 'PERSONALIZED',
+        recipient: institution.owner,
+        data: {
+          institutionId: institution._id,
+          action: 'REFRESH_PROFILE' // Custom action to signal frontend to refresh user profile
+        }
+      });
+
+      const io = getIO();
+      if (io) {
+        // Emit specifically to the owner's socket room (if joined) or via general broadcast if preferred.
+        // Usually, users join a room named by their userId.
+        io.to(institution.owner.toString()).emit("receive_notification", notification);
+      }
+    } catch (notifError) {
+      console.warn("Failed to send institution status notification:", notifError);
     }
 
     return res.status(200).json({

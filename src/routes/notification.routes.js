@@ -10,6 +10,7 @@ import {
 } from "../controllers/notification/notification.controller.js";
 import { verifyTokenMiddleware } from "../middleware/verifyTokenMiddleware.js";
 import { isAdmin } from "../middleware/isAdmin.js";
+import { isInstitutionAdmin } from "../middleware/isInstitutionAdmin.js";
 
 const router = express.Router();
 
@@ -17,7 +18,7 @@ const router = express.Router();
 router.get("/me", verifyTokenMiddleware, getMyNotifications);
 
 // Admin: create custom notification and send to desired user(s)
-router.post("/", verifyTokenMiddleware, isAdmin, createNotification);
+router.post("/", verifyTokenMiddleware, isInstitutionAdmin, createNotification);
 
 // Admin: all notifications with user list
 router.get(
