@@ -1,6 +1,8 @@
 import Institution from "../../models/institution/institution.model.js";
 import { User } from "../../models/auth/user.model.js";
 import { INSTITUTION_STATUS, USER_ROLE } from "../../models/enum.js";
+import Notification from "../../models/notification/notification.model.js";
+import { getIO } from "../../config/socket.js";
 
 /**
  * Student (or any logged-in user) applies to register an institution.
@@ -223,7 +225,7 @@ export const updateInstitutionStatus = async (req, res) => {
       }
     }
 
-      // Send Real-Time Notification to Owner
+    // Send Real-Time Notification to Owner
     try {
       const notification = await Notification.create({
         title: status === INSTITUTION_STATUS.VERIFIED ? 'Institution Verified!' : 'Institution Status Updated',
