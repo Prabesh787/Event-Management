@@ -10,7 +10,7 @@ import { verifyTokenMiddleware } from "../middleware/verifyTokenMiddleware.js";
 
 const router = express.Router();
 
-router.get("/", getAllCategories);
+router.get("/", verifyTokenMiddleware, getAllCategories);
 router.get("/:id", getCategoryById);
 router.post("/", verifyTokenMiddleware, createCategory);
 router.put("/:id", verifyTokenMiddleware, updateCategory);

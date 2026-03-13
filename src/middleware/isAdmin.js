@@ -22,7 +22,7 @@ export const isAdmin = async (req, res, next) => {
       });
     }
 
-    const allowedRoles = [USER_ROLE.ADMIN, USER_ROLE.SYSTEM_ADMIN];
+    const allowedRoles = [USER_ROLE.ADMIN, USER_ROLE.SYSTEM_ADMIN, USER_ROLE.INSTITUTION_ADMIN];
 
     if (!allowedRoles.includes(user.role)) {
       return res.status(403).json({
