@@ -1,4 +1,5 @@
 import Notification from "../../models/notification/notification.model.js";
+import { User } from "../../models/auth/user.model.js";
 import { getIO } from "../../config/socket.js";
 
 /**
@@ -141,12 +142,19 @@ export const getMyNotifications = async (req, res) => {
       });
     }
 
+    // Fetch user to get registration date
+    const user = await User.findById(userId).select("createdAt");
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
     const { page = 1, limit = 20, unreadOnly } = req.query;
     const skip = (Number(page) - 1) * Number(limit);
 
     const filter = {
       $and: [
         { deletedBy: { $ne: userId } },
+        { createdAt: { $gte: user.createdAt } }, // Only show notifications created AFTER user registration
         {
           $or: [
             { recipient: userId },

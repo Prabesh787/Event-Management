@@ -134,11 +134,35 @@ export const getMyRegistrations = async (req, res) => {
 export const getRegistrationsByEvent = async (req, res) => {
   try {
     const { eventId } = req.params;
+    const userId = req.userId;
+
     if (!eventId) {
       return res.status(400).json({
         success: false,
         message: "eventId is required",
       });
+    }
+
+    // Security Check: Ensure the requester owns the event (if Institution Admin)
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ success: false, message: "Event not found" });
+    }
+
+    // If the user is an organizer (Institution Admin), they must own the event
+    // System Admins (who might not be the organizer) should bypass this check if needed,
+    // but typically this endpoint is hit by the event owner.
+    // We'll assume req.userId is populated by auth middleware.
+    if (event.organizer.toString() !== userId) {
+      // Optional: Check if user is a SYSTEM_ADMIN to allow override
+      // For now, strict ownership check for safety
+      const user = await import("../../models/auth/user.model.js").then(m => m.User.findById(userId));
+      if (user && user.role !== "SYSTEM_ADMIN" && user.role !== "ADMIN") {
+         return res.status(403).json({
+           success: false,
+           message: "Unauthorized: You do not own this event",
+         });
+      }
     }
 
     const registrations = await Register.find({ event: eventId })
