@@ -179,31 +179,31 @@ export const createEvent = async (req, res) => {
       registrationFields: registrationFields || [], // NEW: Save the dynamic fields array
     });
 
-    // 2. Save the BROADCAST Notification to DB
-    // We save this so users can see it in their history later
-    const notification = await Notification.create({
-      title: 'New Event Alert!',
-      message: `A new event "${title}" has been listed.`,
-      category: 'NEW_EVENT',
-      scope: 'BROADCAST',
-      data: {
-        eventId: event._id,
-        action: 'OPEN_EVENT'
-      }
-    });
+    // 2. Conditionally send notification if event is immediately published or upcoming
+    if (event.status === EVENT_STATUS.PUBLISHED || event.status === EVENT_STATUS.UPCOMING) {
+      const notification = await Notification.create({
+        title: 'New Event Alert!',
+        message: `A new event "${title}" has been listed.`,
+        category: 'NEW_EVENT',
+        scope: 'BROADCAST',
+        data: {
+          eventId: event._id,
+          action: 'OPEN_EVENT'
+        }
+      });
 
-    // 3. Dispatch Real-Time Alert via Socket.io
-    // Since it's a BROADCAST, we use io.emit to send to ALL connected clients
-    const io = getIO();
-    if (io) io.emit("receive_notification", {
-      _id: notification._id,
-      title: notification.title,
-      message: notification.message,
-      category: notification.category,
-      scope: notification.scope,
-      data: notification.data,
-      createdAt: notification.createdAt
-    });
+      // 3. Dispatch Real-Time Alert via Socket.io
+      const io = getIO();
+      if (io) io.emit("receive_notification", {
+        _id: notification._id,
+        title: notification.title,
+        message: notification.message,
+        category: notification.category,
+        scope: notification.scope,
+        data: notification.data,
+        createdAt: notification.createdAt
+      });
+    }
 
     // 3. Populate and return
     const populated = await Event.findById(event._id)
@@ -313,32 +313,34 @@ export const updateEvent = async (req, res) => {
     }
     await event.save();
 
-    // 2. Save the UPDATED Notification to DB
-    try {
-      const notification = await Notification.create({
-        title: 'Event Updated!',
-        message: `The event "${event.title}" has been updated.`,
-        category: 'EVENT_UPDATED',
-        scope: 'BROADCAST',
-        data: {
-          eventId: event._id,
-          action: 'OPEN_EVENT'
-        }
-      });
+    // 2. Conditionally send notification if event is updated to be published or upcoming
+    if (event.status === EVENT_STATUS.PUBLISHED || event.status === EVENT_STATUS.UPCOMING) {
+      try {
+        const notification = await Notification.create({
+          title: 'Event Updated!',
+          message: `The event "${event.title}" has been updated.`,
+          category: 'EVENT_UPDATED',
+          scope: 'BROADCAST',
+          data: {
+            eventId: event._id,
+            action: 'OPEN_EVENT'
+          }
+        });
 
-      // 3. Dispatch Real-Time Alert via Socket.io
-      const io = getIO();
-      if (io) io.emit("receive_notification", {
-        _id: notification._id,
-        title: notification.title,
-        message: notification.message,
-        category: notification.category,
-        scope: notification.scope,
-        data: notification.data,
-        createdAt: notification.createdAt
-      });
-    } catch (notifError) {
-      console.warn("Failed to send update notification:", notifError);
+        // 3. Dispatch Real-Time Alert via Socket.io
+        const io = getIO();
+        if (io) io.emit("receive_notification", {
+          _id: notification._id,
+          title: notification.title,
+          message: notification.message,
+          category: notification.category,
+          scope: notification.scope,
+          data: notification.data,
+          createdAt: notification.createdAt
+        });
+      } catch (notifError) {
+        console.warn("Failed to send update notification:", notifError);
+      }
     }
 
     const populated = await Event.findById(event._id)
@@ -478,7 +480,7 @@ export const updateEventStatus = async (req, res) => {
     const { status } = req.body;
 
     // 1. Define valid status transitions
-    const validStatuses = ["DRAFT", "PUBLISHED", "COMPLETED", "CANCELLED"];
+    const validStatuses = ["DRAFT", "UPCOMING","PUBLISHED", "COMPLETED", "CANCELLED"];
     
     if (!validStatuses.includes(status)) {
       return res.status(400).json({
@@ -498,7 +500,18 @@ export const updateEventStatus = async (req, res) => {
     }
 
     // 3. Optional: Add business logic guards
-    // Example: Don't allow changing status if the event is already COMPLETED
+    if (event.status === EVENT_STATUS.UPCOMING && status === EVENT_STATUS.DRAFT) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot change status from UPCOMING back to DRAFT",
+      });
+    }
+    if (event.status === EVENT_STATUS.PUBLISHED && (status === EVENT_STATUS.DRAFT || status === EVENT_STATUS.UPCOMING)) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot change status from PUBLISHED back to DRAFT or UPCOMING",
+      });
+    }
     if (event.status === "COMPLETED" && status !== "COMPLETED") {
        return res.status(400).json({
          success: false,
@@ -506,8 +519,40 @@ export const updateEventStatus = async (req, res) => {
        });
     }
 
+    const wasDraft = event.status === EVENT_STATUS.DRAFT;
+    const isNowPublic = status === EVENT_STATUS.UPCOMING || status === EVENT_STATUS.PUBLISHED;
+
     event.status = status;
     await event.save();
+
+    // If event moved from DRAFT to a public status, send a NEW_EVENT notification
+    if (wasDraft && isNowPublic) {
+      try {
+        const notification = await Notification.create({
+          title: 'New Event Alert!',
+          message: `A new event "${event.title}" has been listed.`,
+          category: 'NEW_EVENT',
+          scope: 'BROADCAST',
+          data: {
+            eventId: event._id,
+            action: 'OPEN_EVENT'
+          }
+        });
+
+        const io = getIO();
+        if (io) io.emit("receive_notification", {
+          _id: notification._id,
+          title: notification.title,
+          message: notification.message,
+          category: notification.category,
+          scope: notification.scope,
+          data: notification.data,
+          createdAt: notification.createdAt
+        });
+      } catch (notifError) {
+        console.warn("Failed to send new event notification on status change:", notifError);
+      }
+    }
 
     return res.status(200).json({
       success: true,
