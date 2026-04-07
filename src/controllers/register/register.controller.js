@@ -60,40 +60,56 @@ export const registerForEvent = async (req, res) => {
 
     // Prevent duplicate registration
     const existing = await Register.findOne({ user: userId, event: eventId });
-    if (existing && existing.status === "REGISTERED") {
+    if (existing && (existing.status === "REGISTERED" || existing.status === "PENDING")) {
       return res.status(400).json({
         success: false,
-        message: "You are already registered for this event",
+        message: existing.status === "REGISTERED" 
+          ? "You are already registered for this event"
+          : "You have a pending registration for this event. Please complete payment.",
       });
     }
+
+    // Determine initial status and payment status based on event price
+    const initialStatus = event.isFree ? "REGISTERED" : "PENDING";
+    const initialPaymentStatus = event.isFree ? "NOT_REQUIRED" : "UNPAID";
 
     // 3. Save Registration with additionalInfo
     const registration = existing
       ? await Register.findByIdAndUpdate(
           existing._id,
-          { status: "REGISTERED", additionalInfo }, // Update info if re-registering
+          { 
+            status: initialStatus, 
+            paymentStatus: initialPaymentStatus,
+            additionalInfo 
+          },
           { new: true }
         )
       : await Register.create({ 
           user: userId, 
           event: eventId, 
-          additionalInfo // Save the dynamic fields
+          status: initialStatus,
+          paymentStatus: initialPaymentStatus,
+          additionalInfo
         });
 
-    // Update availableSeats
-    if (typeof event.totalSeats === "number") {
+    // Update availableSeats only if registered (free event)
+    if (event.isFree && typeof event.totalSeats === "number") {
       const currentAvailable = event.availableSeats ?? event.totalSeats;
       event.availableSeats = Math.max(0, currentAvailable - 1);
       await event.save();
     }
 
     const populated = await Register.findById(registration._id)
-      .populate("event", "title startDate endDate location status")
+      .populate("event", "title startDate endDate location status isFree price")
       .populate("user", "name email");
+
+    const message = event.isFree 
+      ? "Registered for event successfully" 
+      : "Registration initiated. Please complete payment to confirm.";
 
     return res.status(201).json({
       success: true,
-      message: "Registered for event successfully",
+      message,
       registration: populated,
     });
   } catch (error) {

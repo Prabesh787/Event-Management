@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { BOOKING_STATUS, PAYMENT_STATUS } from "../enums.js";
+import { BOOKING_STATUS, PAYMENT_STATUS } from "../enum.js";
 
 const bookingSchema = new mongoose.Schema(
   {
@@ -35,6 +35,9 @@ const bookingSchema = new mongoose.Schema(
       enum: Object.values(PAYMENT_STATUS),
       default: PAYMENT_STATUS.UNPAID,
     },
+
+    paypalOrderId: String,
+    paypalCaptureId: String,
   },
   { timestamps: true }
 );

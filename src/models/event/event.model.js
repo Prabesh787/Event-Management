@@ -48,6 +48,7 @@ const eventSchema = new mongoose.Schema(
     totalSeats: Number,
     availableSeats: Number,
 
+    isFree: { type: Boolean, default: true },
     price: { type: Number, default: 0 },
 
     registrationFields: [

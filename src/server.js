@@ -12,6 +12,7 @@ import registerRoutes from "./routes/register.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
 import institutionRoutes from "./routes/institution.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
+import paypalRoutes from "./routes/paypal.routes.js";
 import { Server } from "socket.io";
 
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
@@ -52,6 +53,7 @@ app.use("/api/registrations", registerRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/institutions", institutionRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/paypal", paypalRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
