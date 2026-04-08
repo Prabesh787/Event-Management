@@ -1,6 +1,7 @@
 import { OrdersController } from "@paypal/paypal-server-sdk";
 import client from "../../config/paypal.js";
 import Register from "../../models/register/register.model.js";
+import { sendRegistrationConfirmedEmail } from "../../mailtrap/emails.js";
 
 const ordersController = new OrdersController(client);
 
@@ -84,7 +85,7 @@ export const capturePayPalOrder = async (req, res) => {
     const { result, ...httpResponse } = response;
 
     // Find the registration with this order ID
-    const registration = await Register.findOne({ paypalOrderId: orderId });
+    const registration = await Register.findOne({ paypalOrderId: orderId }).populate("user");
     if (!registration) {
       return res.status(404).json({ success: false, message: "Registration not found for this PayPal order" });
     }
@@ -105,7 +106,19 @@ export const capturePayPalOrder = async (req, res) => {
         await event.save();
       }
 
-      return res.status(httpResponse.statusCode).json({
+      // Send confirmation email with QR code
+      if (event && registration.user) {
+        await sendRegistrationConfirmedEmail(
+          registration.user.email,
+          registration.user.name,
+          event.title,
+          event.startDate ? event.startDate.toLocaleString() : "N/A",
+          event.location?.venue || "TBD",
+          registration._id
+        );
+      }
+
+      return res.status(httpResponse.statusCode || 200).json({
         success: true,
         message: "Payment captured and registration confirmed successfully",
         registration,

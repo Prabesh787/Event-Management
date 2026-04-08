@@ -1,5 +1,9 @@
 import Register from "../../models/register/register.model.js";
 import Event from "../../models/event/event.model.js";
+import { 
+  sendRegistrationPendingEmail, 
+  sendRegistrationConfirmedEmail 
+} from "../../mailtrap/emails.js";
 
 // Student registers / enrolls into an event (no seat selection)
 export const registerForEvent = async (req, res) => {
@@ -26,6 +30,13 @@ export const registerForEvent = async (req, res) => {
     const event = await Event.findById(eventId);
     if (!event) {
       return res.status(404).json({ success: false, message: "Event not found" });
+    }
+
+    // Load user for email sending
+    const userModel = await import("../../models/auth/user.model.js").then(m => m.default || m.User);
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
     // Check if PUBLISHED
@@ -97,7 +108,26 @@ export const registerForEvent = async (req, res) => {
       const currentAvailable = event.availableSeats ?? event.totalSeats;
       event.availableSeats = Math.max(0, currentAvailable - 1);
       await event.save();
+
+      // Send confirmation email for free event
+      await sendRegistrationConfirmedEmail(
+        user.email,
+        user.name,
+        event.title,
+        event.startDate.toLocaleString(),
+        event.location?.venue || "TBD",
+        registration._id
+      );
+    } else if (!event.isFree) {
+      // Send pending email for paid event
+      await sendRegistrationPendingEmail(
+        user.email,
+        user.name,
+        event.title,
+        event.price
+      );
     }
+
 
     const populated = await Register.findById(registration._id)
       .populate("event", "title startDate endDate location status isFree price")

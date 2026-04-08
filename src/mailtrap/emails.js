@@ -1,9 +1,68 @@
 import {
   PASSWORD_RESET_REQUEST_TEMPLATE,
   PASSWORD_RESET_SUCCESS_TEMPLATE,
+  REGISTRATION_CONFIRMED_TEMPLATE,
+  REGISTRATION_PENDING_TEMPLATE,
   VERIFICATION_EMAIL_TEMPLATE,
 } from "./emailTemplates.js";
 import { transporter, sender } from "./mailtrap.config.js";
+import QRCode from "qrcode";
+
+export const sendRegistrationPendingEmail = async (email, userName, eventTitle, eventPrice) => {
+  const html = REGISTRATION_PENDING_TEMPLATE
+    .replace("{userName}", userName)
+    .replace("{eventTitle}", eventTitle)
+    .replace("{eventPrice}", eventPrice);
+
+  try {
+    await transporter.sendMail({
+      from: `"${sender.name}" <${sender.email}>`,
+      to: email,
+      subject: `Action Required: Registration Pending for ${eventTitle}`,
+      html,
+    });
+  } catch (error) {
+    console.error("Error sending pending registration email:", error);
+  }
+};
+
+export const sendRegistrationConfirmedEmail = async (email, userName, eventTitle, eventDate, eventLocation, registrationId) => {
+  try {
+    // Generate QR Code as data URL
+    const qrData = JSON.stringify({
+      registrationId,
+      event: eventTitle,
+      user: userName
+    });
+    const qrCodeDataUrl = await QRCode.toDataURL(qrData);
+    
+    // Extract base64 part
+    const base64Data = qrCodeDataUrl.split(",")[1];
+
+    const html = REGISTRATION_CONFIRMED_TEMPLATE
+      .replace("{userName}", userName)
+      .replace("{eventTitle}", eventTitle)
+      .replace("{eventDate}", eventDate)
+      .replace("{eventLocation}", eventLocation);
+
+    await transporter.sendMail({
+      from: `"${sender.name}" <${sender.email}>`,
+      to: email,
+      subject: `Confirmed: Your registration for ${eventTitle}`,
+      html,
+      attachments: [
+        {
+          filename: "qrcode.png",
+          content: base64Data,
+          encoding: "base64",
+          cid: "qrcode", // same cid as in html template img tag
+        },
+      ],
+    });
+  } catch (error) {
+    console.error("Error sending confirmed registration email:", error);
+  }
+};
 
 export const sendVerificationEmail = async (email, verificationToken) => {
   const html = VERIFICATION_EMAIL_TEMPLATE.replace(
