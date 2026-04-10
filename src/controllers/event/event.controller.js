@@ -126,6 +126,44 @@ export const createEvent = async (req, res) => {
       });
     }
 
+    const now = new Date();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (start < now) {
+      return res.status(400).json({
+        success: false,
+        message: "Event start date cannot be in the past",
+      });
+    }
+
+    if (end <= start) {
+      return res.status(400).json({
+        success: false,
+        message: "Event end date must be after the start date",
+      });
+    }
+
+    if (registrationStartDate) {
+      const regStart = new Date(registrationStartDate);
+      if (regStart > start) {
+        return res.status(400).json({
+          success: false,
+          message: "Registration must start before the event starts",
+        });
+      }
+    }
+
+    if (registrationEndDate) {
+      const regEnd = new Date(registrationEndDate);
+      if (regEnd > start) {
+        return res.status(400).json({
+          success: false,
+          message: "Registration must end before the event starts",
+        });
+      }
+    }
+
     const availableSeats = totalSeats != null ? Number(totalSeats) : undefined;
 
     // Determine institution ownership:
