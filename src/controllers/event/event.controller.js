@@ -114,6 +114,7 @@ export const createEvent = async (req, res) => {
       totalSeats,
       price,
       status,
+      isFree,
       bannerImage, // preferred: { url, publicId }
       bannerUrl, // backward compat: string URL
       registrationStartDate,
@@ -212,6 +213,7 @@ export const createEvent = async (req, res) => {
       endDate,
       registrationStartDate,
       registrationEndDate,
+      isFree,
       totalSeats: availableSeats,
       availableSeats: availableSeats ?? 0,
       price: price != null ? Number(price) : 0,
