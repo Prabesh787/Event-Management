@@ -27,7 +27,7 @@ export const getAllEvents = async (req, res) => {
       .populate("category", "name description")
       .populate("organizer", "name email")
       .populate("institution", "name description")
-      .sort({ startDate: 1 })
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(Number(limit))
       .lean();
