@@ -169,7 +169,13 @@ export const login = async (req, res) => {
 };
 
 export const logout = async (req, res) => {
-  res.clearCookie("token");
+  const isProd = process.env.NODE_ENV === "production";
+  // clearCookie only works if the attributes match those used when setting it.
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
+  });
   res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
