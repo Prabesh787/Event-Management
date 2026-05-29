@@ -61,7 +61,12 @@ export const signup = async (req, res) => {
     await user.save();
 
     generateTokenAndSetCookie(res, user._id);
-    await sendVerificationEmail(user.email, verificationToken);
+
+    // Best-effort: a failed verification email must NOT fail account creation.
+    // Fire-and-forget so a slow/blocked SMTP host can't time out the request.
+    sendVerificationEmail(user.email, verificationToken).catch((err) =>
+      console.error("Verification email failed (non-blocking):", err.message)
+    );
 
     res.status(201).json({
       success: true,
