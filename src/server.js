@@ -28,9 +28,16 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
+// Normalize the allowed origin: strip any trailing slash, which otherwise
+// causes an exact-match failure and silently blocks credentialed requests.
+const CLIENT_ORIGIN = (process.env.CLIENT_URL || "http://localhost:3000").replace(
+  /\/$/,
+  ""
+);
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5100",
+    origin: CLIENT_ORIGIN,
     credentials: true,
   })
 );
@@ -70,7 +77,8 @@ const server = app.listen(PORT, async () => {
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: CLIENT_ORIGIN,
+    credentials: true,
   },
 });
 setIO(io);

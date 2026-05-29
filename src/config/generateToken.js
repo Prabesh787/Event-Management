@@ -1,7 +1,8 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+  // Use the same secret env var as the live cookie auth (JWT_SCERET).
+  return jwt.sign({ id }, process.env.JWT_SCERET, {
     expiresIn: "30d",
   });
 };
