@@ -1,5 +1,9 @@
 import Register from "../../models/register/register.model.js";
 import Event from "../../models/event/event.model.js";
+import { 
+  sendRegistrationPendingEmail, 
+  sendRegistrationConfirmedEmail 
+} from "../../mailtrap/emails.js";
 
 // Student registers / enrolls into an event (no seat selection)
 export const registerForEvent = async (req, res) => {
@@ -26,6 +30,13 @@ export const registerForEvent = async (req, res) => {
     const event = await Event.findById(eventId);
     if (!event) {
       return res.status(404).json({ success: false, message: "Event not found" });
+    }
+
+    // Load user for email sending
+    const userModel = await import("../../models/auth/user.model.js").then(m => m.default || m.User);
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
     // Check if PUBLISHED
@@ -60,40 +71,75 @@ export const registerForEvent = async (req, res) => {
 
     // Prevent duplicate registration
     const existing = await Register.findOne({ user: userId, event: eventId });
-    if (existing && existing.status === "REGISTERED") {
+    if (existing && (existing.status === "REGISTERED" || existing.status === "PENDING")) {
       return res.status(400).json({
         success: false,
-        message: "You are already registered for this event",
+        message: existing.status === "REGISTERED" 
+          ? "You are already registered for this event"
+          : "You have a pending registration for this event. Please complete payment.",
       });
     }
+
+    // Determine initial status and payment status based on event price
+    const initialStatus = event.isFree ? "REGISTERED" : "PENDING";
+    const initialPaymentStatus = event.isFree ? "NOT_REQUIRED" : "UNPAID";
 
     // 3. Save Registration with additionalInfo
     const registration = existing
       ? await Register.findByIdAndUpdate(
           existing._id,
-          { status: "REGISTERED", additionalInfo }, // Update info if re-registering
+          { 
+            status: initialStatus, 
+            paymentStatus: initialPaymentStatus,
+            additionalInfo 
+          },
           { new: true }
         )
       : await Register.create({ 
           user: userId, 
           event: eventId, 
-          additionalInfo // Save the dynamic fields
+          status: initialStatus,
+          paymentStatus: initialPaymentStatus,
+          additionalInfo
         });
 
-    // Update availableSeats
-    if (typeof event.totalSeats === "number") {
+    // Update availableSeats only if registered (free event)
+    if (event.isFree && typeof event.totalSeats === "number") {
       const currentAvailable = event.availableSeats ?? event.totalSeats;
       event.availableSeats = Math.max(0, currentAvailable - 1);
       await event.save();
+
+      // Send confirmation email for free event
+      await sendRegistrationConfirmedEmail(
+        user.email,
+        user.name,
+        event.title,
+        event.startDate.toLocaleString(),
+        event.location?.venue || "TBD",
+        registration._id
+      );
+    } else if (!event.isFree) {
+      // Send pending email for paid event
+      await sendRegistrationPendingEmail(
+        user.email,
+        user.name,
+        event.title,
+        event.price
+      );
     }
 
+
     const populated = await Register.findById(registration._id)
-      .populate("event", "title startDate endDate location status")
+      .populate("event", "title startDate endDate location status isFree price")
       .populate("user", "name email");
+
+    const message = event.isFree 
+      ? "Registered for event successfully" 
+      : "Registration initiated. Please complete payment to confirm.";
 
     return res.status(201).json({
       success: true,
-      message: "Registered for event successfully",
+      message,
       registration: populated,
     });
   } catch (error) {

@@ -16,9 +16,18 @@ const registerSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["REGISTERED", "CANCELLED"],
+      enum: ["PENDING", "REGISTERED", "CANCELLED", "FAILED"],
       default: "REGISTERED",
     },
+
+    paymentStatus: {
+      type: String,
+      enum: ["UNPAID", "PAID", "NOT_REQUIRED"],
+      default: "NOT_REQUIRED",
+    },
+
+    paypalOrderId: String,
+    paypalCaptureId: String,
 
     /**
      * NEW: Dynamic registration data.

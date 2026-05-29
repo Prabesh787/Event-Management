@@ -26,7 +26,8 @@ export const getAllEvents = async (req, res) => {
     const events = await Event.find(filter)
       .populate("category", "name description")
       .populate("organizer", "name email")
-      .sort({ startDate: 1 })
+      .populate("institution", "name description")
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(Number(limit))
       .lean();
@@ -46,7 +47,8 @@ export const getEventById = async (req, res) => {
   try {
     const event = await Event.findById(req.params.id)
       .populate("category", "name description")
-      .populate("organizer", "name email");
+      .populate("organizer", "name email")
+      .populate("institution", "name description");
     if (!event) {
       return res.status(404).json({ success: false, message: "Event not found" });
     }
@@ -83,6 +85,7 @@ export const getEventsByInstitution = async (req, res) => {
     const events = await Event.find(filter)
       .populate("category", "name description")
       .populate("organizer", "name email")
+      .populate("institution", "name description")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(Number(limit))
@@ -111,6 +114,7 @@ export const createEvent = async (req, res) => {
       totalSeats,
       price,
       status,
+      isFree,
       bannerImage, // preferred: { url, publicId }
       bannerUrl, // backward compat: string URL
       registrationStartDate,
@@ -124,6 +128,44 @@ export const createEvent = async (req, res) => {
         success: false,
         message: "Title, category, startDate and endDate are required",
       });
+    }
+
+    const now = new Date();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (start < now) {
+      return res.status(400).json({
+        success: false,
+        message: "Event start date cannot be in the past",
+      });
+    }
+
+    if (end <= start) {
+      return res.status(400).json({
+        success: false,
+        message: "Event end date must be after the start date",
+      });
+    }
+
+    if (registrationStartDate) {
+      const regStart = new Date(registrationStartDate);
+      if (regStart > start) {
+        return res.status(400).json({
+          success: false,
+          message: "Registration must start before the event starts",
+        });
+      }
+    }
+
+    if (registrationEndDate) {
+      const regEnd = new Date(registrationEndDate);
+      if (regEnd > start) {
+        return res.status(400).json({
+          success: false,
+          message: "Registration must end before the event starts",
+        });
+      }
     }
 
     const availableSeats = totalSeats != null ? Number(totalSeats) : undefined;
@@ -171,6 +213,7 @@ export const createEvent = async (req, res) => {
       endDate,
       registrationStartDate,
       registrationEndDate,
+      isFree,
       totalSeats: availableSeats,
       availableSeats: availableSeats ?? 0,
       price: price != null ? Number(price) : 0,

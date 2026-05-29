@@ -500,3 +500,58 @@ export const PASSWORD_RESET_REQUEST_TEMPLATE = `
   </body>
 </html>
 `;
+
+export const REGISTRATION_PENDING_TEMPLATE = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Pending</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: linear-gradient(135deg, #f59e0b, #d97706); padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0;">Registration Initiated</h1>
+    </div>
+    <div style="background-color: #f9fafb; padding: 20px; border: 1px solid #e5e7eb; border-radius: 0 0 10px 10px;">
+        <p>Hello {userName},</p>
+        <p>You have initiated registration for the event: <strong>{eventTitle}</strong>.</p>
+        <div style="background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0;">
+            <p style="margin: 0; color: #92400e;"><strong>Action Required:</strong> Please complete your payment of <strong>\${eventPrice}</strong> to confirm your registration.</p>
+        </div>
+        <p>Once payment is successful, you will receive your confirmed ticket with a QR code.</p>
+        <p>Best regards,<br>Campus Event Hub Team</p>
+    </div>
+</body>
+</html>
+`;
+
+export const REGISTRATION_CONFIRMED_TEMPLATE = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Confirmed</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: linear-gradient(135deg, #10b981, #059669); padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0;">Registration Confirmed!</h1>
+    </div>
+    <div style="background-color: #f9fafb; padding: 20px; border: 1px solid #e5e7eb; border-radius: 0 0 10px 10px;">
+        <p>Hello {userName},</p>
+        <p>Your registration for <strong>{eventTitle}</strong> is now confirmed.</p>
+        <div style="text-align: center; margin: 30px 0; background-color: white; padding: 20px; border-radius: 10px; border: 1px dashed #10b981;">
+            <p style="margin-bottom: 15px; color: #065f46; font-weight: bold;">Your Event Ticket</p>
+            <img src="cid:qrcode" alt="Event QR Code" style="width: 200px; height: 200px;">
+            <p style="margin-top: 15px; font-size: 12px; color: #6b7280;">Please present this QR code at the event entrance.</p>
+        </div>
+        <p><strong>Event Details:</strong><br>
+        Date: {eventDate}<br>
+        Location: {eventLocation}</p>
+        <p>We look forward to seeing you there!</p>
+        <p>Best regards,<br>Campus Event Hub Team</p>
+    </div>
+</body>
+</html>
+`;
