@@ -1,3 +1,6 @@
+// Must run before any other import that reads process.env at module load
+// (e.g. googleClient.js, mailtrap.config.js).
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
